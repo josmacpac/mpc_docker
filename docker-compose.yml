@@ -24,16 +24,16 @@ services:
       api:
         condition: service_healthy
     volumes:
-      - ${MPC_VET_PATH:-../mpc_frontend}:/app/vet:ro
-      - ${MPC_ADMIN_PATH:-../admin_mpc}:/app/admin:ro
+      - ${MPC_VET_PATH:-../mpc_frontend}:/app/vet
+      - ${MPC_ADMIN_PATH:-../admin_mpc}:/app/admin
       - ${MPC_CLIENTES_PATH:-../mpc_clientes}:/app/clientes
     environment:
       - API_URL=http://api:5000
-      - VET_API_URL=${VET_API_URL:-http://localhost/api}
+      - VET_API_URL=${VET_API_URL:-http://localhost}
       - VET_SUPABASE_URL=${VET_SUPABASE_URL}
       - VET_SUPABASE_ANON_KEY=${VET_SUPABASE_ANON_KEY}
-      - ADMIN_API_URL=${ADMIN_API_URL:-http://localhost/api}
+      - ADMIN_API_URL=${ADMIN_API_URL:-http://localhost}
       - ADMIN_SUPABASE_URL=${ADMIN_SUPABASE_URL}
       - ADMIN_SUPABASE_ANON_KEY=${ADMIN_SUPABASE_ANON_KEY}
-      - CLIENTES_API_URL=${CLIENTES_API_URL:-http://localhost/api}
+      - CLIENTES_API_URL=${CLIENTES_API_URL:-http://localhost}
     restart: unless-stopped
