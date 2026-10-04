@@ -27,6 +27,7 @@ services:
       - ${MPC_VET_PATH:-../mpc_frontend}:/app/vet
       - ${MPC_ADMIN_PATH:-../admin_mpc}:/app/admin
       - ${MPC_CLIENTES_PATH:-../mpc_clientes}:/app/clientes
+      - ${MPC_APP_CLIENTES_PATH:-../mpc_app_clientes}:/app/app-clientes
     environment:
       - API_URL=http://api:5000
       - VET_API_URL=${VET_API_URL:-http://localhost}
@@ -36,4 +37,5 @@ services:
       - ADMIN_SUPABASE_URL=${ADMIN_SUPABASE_URL}
       - ADMIN_SUPABASE_ANON_KEY=${ADMIN_SUPABASE_ANON_KEY}
       - CLIENTES_API_URL=${CLIENTES_API_URL:-http://localhost}
+      - APP_CLIENTES_API_URL=${APP_CLIENTES_API_URL:-}
     restart: unless-stopped
