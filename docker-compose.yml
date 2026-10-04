@@ -41,6 +41,7 @@ services:
       - ADMIN_SUPABASE_ANON_KEY=${ADMIN_SUPABASE_ANON_KEY}
       - CLIENTES_API_URL=${CLIENTES_API_URL:-http://localhost}
       - APP_CLIENTES_API_URL=${APP_CLIENTES_API_URL:-}
+      - DEPLOY_KEY=${DEPLOY_KEY:-}
     restart: unless-stopped
 
 volumes:

@@ -14,6 +14,7 @@ inject_config() {
   local api_url_var="$3"
   local supabase_url_var="$4"
   local anon_key_var="$5"
+  local deploy_key_var="${6:-}"
 
   if [ ! -f "$app_dir/scripts/inject-env.js" ]; then
     echo "  ⚠ $name: inject-env.js no encontrado, saltando"
@@ -25,7 +26,14 @@ inject_config() {
   API_URL="$api_url_var" \
   SUPABASE_URL="$supabase_url_var" \
   SUPABASE_ANON_KEY="$anon_key_var" \
+  DEPLOY_KEY="$deploy_key_var" \
   node "$app_dir/scripts/inject-env.js"
+
+  # El contenedor corre como root: si config.js quedó root-owned en el
+  # host no se puede editar después. Hereda el dueño del directorio js/.
+  if [ -f "$app_dir/js/config.js" ] && [ -d "$app_dir/js" ]; then
+    chown --reference="$app_dir/js" "$app_dir/js/config.js" 2>/dev/null || true
+  fi
 }
 
 echo ""
@@ -35,7 +43,8 @@ inject_config "Vet" "/app/vet" \
   "$VET_API_URL" "$VET_SUPABASE_URL" "$VET_SUPABASE_ANON_KEY"
 
 inject_config "Admin" "/app/admin" \
-  "$ADMIN_API_URL" "$ADMIN_SUPABASE_URL" "$ADMIN_SUPABASE_ANON_KEY"
+  "$ADMIN_API_URL" "$ADMIN_SUPABASE_URL" "$ADMIN_SUPABASE_ANON_KEY" \
+  "$DEPLOY_KEY"
 
 # -------------------------------------------------------------------
 # 2. Build de clientes (Vite) si no existe dist/
