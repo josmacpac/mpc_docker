@@ -28,6 +28,9 @@ services:
       - ${MPC_ADMIN_PATH:-../admin_mpc}:/app/admin
       - ${MPC_CLIENTES_PATH:-../mpc_clientes}:/app/clientes
       - ${MPC_APP_CLIENTES_PATH:-../mpc_app_clientes}:/app/app-clientes
+      # node_modules propio del contenedor (musl/Alpine): evita que
+      # npm install dentro del contenedor borre los bindings glibc del host.
+      - app-clientes-node-modules:/app/app-clientes/node_modules
     environment:
       - API_URL=http://api:5000
       - VET_API_URL=${VET_API_URL:-http://localhost}
@@ -39,3 +42,6 @@ services:
       - CLIENTES_API_URL=${CLIENTES_API_URL:-http://localhost}
       - APP_CLIENTES_API_URL=${APP_CLIENTES_API_URL:-}
     restart: unless-stopped
+
+volumes:
+  app-clientes-node-modules:
