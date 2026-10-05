@@ -78,18 +78,28 @@ echo ""
 echo "2b/3 Build de app-clientes (nuevo portal)..."
 
 if [ -f "/app/app-clientes/package.json" ]; then
-  # node_modules viene del host (glibc); Alpine usa musl y necesita los
-  # bindings nativos (rolldown, lightningcss). Si faltan, npm install los agrega.
-  need_musl=0
-  if [ -d "/app/app-clientes/node_modules" ]; then
-    [ ! -d "/app/app-clientes/node_modules/@rolldown/binding-linux-x64-musl" ] && need_musl=1
+  # node_modules es un volumen aislado (musl/Alpine) y NO comparte el del host
+  # (glibc): hay que instalarlo cuando falten bindings musl o cuando el
+  # package-lock.json del host sea más nuevo que lo instalado (paquete nuevo).
+  need_install=0
+  if [ ! -d "/app/app-clientes/node_modules" ]; then
+    need_install=1
+  else
+    [ ! -d "/app/app-clientes/node_modules/@rolldown/binding-linux-x64-musl" ] && need_install=1
     if [ -d "/app/app-clientes/node_modules/lightningcss-linux-x64-gnu" ] \
        && [ ! -d "/app/app-clientes/node_modules/lightningcss-linux-x64-musl" ]; then
-      need_musl=1
+      need_install=1
+    fi
+    if [ -f "/app/app-clientes/package-lock.json" ]; then
+      if [ ! -f "/app/app-clientes/node_modules/.package-lock.json" ] \
+         || [ "/app/app-clientes/package-lock.json" -nt "/app/app-clientes/node_modules/.package-lock.json" ]; then
+        echo "  → App Clientes: package-lock.json más nuevo que node_modules instalado..."
+        need_install=1
+      fi
     fi
   fi
-  if [ "$need_musl" = "1" ]; then
-    echo "  → App Clientes: instalando bindings musl (node_modules del host es glibc)..."
+  if [ "$need_install" = "1" ]; then
+    echo "  → App Clientes: instalando dependencias (bindings musl + paquetes nuevos)..."
     if ! (cd /app/app-clientes && npm install --silent); then
       echo "  ⚠ App Clientes: npm install falló"
     fi
